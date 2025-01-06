@@ -74,7 +74,7 @@ class step_1:
         Data = [ ]
         tb1 = self.__phase1()
         TEXT_POS = tb1.columns.get_loc('topic')
-        print('(1) Running - Web Scraping from Google:')
+        print('(1) Running - Web Scraping:')
         progress_index = tb1.shape[0]
         with alive_bar(progress_index) as bar:
             for i, row in tb1.iterrows():
