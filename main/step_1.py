@@ -68,7 +68,8 @@ class step_1:
         Private Method
         '''
         agent={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'}
-        url='https://www.google.com/search?q='
+#        sostituire indirizzo con il motore di ricerca        
+        url='https://125.0.0.1/search?q='
         tb2 = pd.DataFrame({})
         Data = [ ]
         tb1 = self.__phase1()
