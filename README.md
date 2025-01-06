@@ -1,7 +1,7 @@
 # PyTeAR
 
 Python Text Analysis Routine, pipeline for identify propaganda in the speechs or articles.
-In this Alpha 0 version the pipeline support only english language
+In this Alpha 0 version the pipeline support only English language
 
 <code>
 -----------------------------------
