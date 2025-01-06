@@ -113,7 +113,7 @@ class step_3(object):
                     row[NDET_POS] = 'Propaganda detection superata'
                     
                 data.append(row)
-                tb4 = pd.DataFrame(data, columns=['surname', 'value', 'topic', 'title', 'metadata', 'source', 'FleschReadIndex', 'SmogIndex', 'PolarityScore', 'EmpathyScore', 'UglyScore', 'StyleText', 'Abstract', 'Keywords', 'PropDetectionSynth', 'PropDetectionNoSynth'])
+                tb4 = pd.DataFrame(data, columns=['name', 'surname', 'holiday', 'death', 'nationality', 'political_party', 'value', 'topic', 'title', 'metadata', 'source', 'FleschReadIndex', 'SmogIndex', 'PolarityScore', 'EmpathyScore', 'UglyScore', 'StyleText', 'Abstract', 'Keywords', 'PropDetectionSynth', 'PropDetectionNoSynth'])
                 bar()
         
         return tb4
