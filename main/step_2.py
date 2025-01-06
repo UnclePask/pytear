@@ -146,7 +146,7 @@ class step_2(object):
                         row.values[ABST_POS] = 'Non classificabile'
                         
                     data.append(row)
-                    tb3 = pd.DataFrame(data, columns=['surname', 'value', 'topic', 'title', 'metadata', 'source', 'FleschReadIndex', 'SmogIndex', 'PolarityScore', 'EmpathyScore', 'UglyScore', 'StyleText', 'Abstract', 'Keywords'])
+                    tb3 = pd.DataFrame(data, columns=['name', 'surname', 'holiday', 'death', 'nationality', 'political_party', 'value', 'topic', 'title', 'metadata', 'source', 'FleschReadIndex', 'SmogIndex', 'PolarityScore', 'EmpathyScore', 'UglyScore', 'StyleText', 'Abstract', 'Keywords'])
                     bar()
 
             return tb3
