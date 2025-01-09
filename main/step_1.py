@@ -42,18 +42,6 @@ class step_1:
         Fase 1 della trasformazione: inner join della sorgente in input .tsv con la base dati anagrafica in json
         Private Method
         '''
-#===============================================================================
-#         dataEs1 =  pd.DataFrame( {
-#                 'name' : ['Barak', 'Winston', 'Donald', 'Jhoseph'],
-#                 'surname': ['Obama', 'Churchill', 'Trump', 'Goebbels'],
-#                 'holiday': ['04/08/1961', '30/11/1874', '14/06/1946', '29/10/1897'],
-#                'death': ['', '24/01/1965', '', '01/05/1945'],
-#                 'nationality': ['USA', 'Great Britain', 'USA', 'Germany'],
-#                 'political_party': ['Democratic', 'Conservatives', 'Republican', 'Nazist'],
-#                 } )
-# 
-#         make.convert.toJSON(dataEs1)
-#===============================================================================
         anagrafica = make.convert.jsonToString(self.fileAnagraph)
         json_load = json.loads(anagrafica)
         dataJSON_pandas = pd.read_json(json_load, orient='records')
