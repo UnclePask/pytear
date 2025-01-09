@@ -130,7 +130,7 @@ import torch.nn as nn
 # Define the loss function
 loss_fn  = nn.CrossEntropyLoss()
 # Number of training epochs
-epochs = 2
+epochs = 5
 # Maledetto M2!!!!!!!!!
 #device = 'cpu'
 
