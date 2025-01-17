@@ -131,8 +131,6 @@ import torch.nn as nn
 loss_fn  = nn.CrossEntropyLoss()
 # Number of training epochs
 epochs = 5
-# Maledetto M2!!!!!!!!!
-#device = 'cpu'
 
 # Define architecture
 from bert_ml.BERT_arch import BERT_Arch
