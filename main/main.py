@@ -10,11 +10,11 @@ from pathlib import Path
 from warnings import filterwarnings
 filterwarnings('ignore')
 
-def start_pipeline(FilePath, AnagPath):
-    print('\n\nCiao, questa è PyTeAR (alpha 0)!\nThe routine transformation pipeline to identify the propaganda content \nin the speechs and articles\n\n')
-    node1 = at1_do.step_1(FilePath, AnagPath, True)
+def start_pipeline(FilePath):
+    print('\n\nCiao, questa è PyTeAR (alpha 0)!\nthe routine transformation pipeline to identify the propaganda content \nin the speechs and articles\n\n')
+    node1 = at1_do.step_1(FilePath, True)
     table1 = node1.data_scout()
-#   table1.to_csv('../speech-1_2.csv', sep=';')
+#    table1.to_csv('../speech-1_2.csv', sep=';')
     print('\n')
     node2 = at2_do.step_2(table1)
     table2 = node2.text_analysis()
@@ -33,9 +33,10 @@ def start_pipeline(FilePath, AnagPath):
     #print(table3)
     
 def main():
-    anagraphPath = '../inputFile/anagraphic.json'
+#    anagraphPath = '../inputFile/anagraphic.json'
     inputFile = '../inputFile/speech-a.tsv'
-    exit_val = start_pipeline(inputFile, anagraphPath)
+#    exit_val = start_pipeline(inputFile, anagraphPath)
+    exit_val = start_pipeline(inputFile)
     return exit_val
     
 if __name__ == '__main__':
