@@ -1,6 +1,7 @@
 #begin standard code to import
+from os import name as nameos
 from transformers import pipeline
-from thinc.compat import torch
+import torch
 unmasker = pipeline('fill-mask', model='bert-base-uncased')
 unmasker("Hello I'm a [MASK] model.")
 [
@@ -43,15 +44,20 @@ text = "Replace me by any text you'd like."
 encoded_input = tokenizer(text, return_tensors='pt')
 output = model(**encoded_input)
 print(output)
-
 #end standard code to import
 
 import pandas as pd
+from pathlib import Path
 
 label_map = {'Fake': 1, 
              'True': 0}
 
-data = pd.read_csv('model_prof.tsv', sep='\t', names=['surname', 'Target', 'topic'])
+if nameos == 'nt':
+    path_file = str(Path.cwd()) + '\\main\\bert_ml\\model_prof.tsv'
+else:
+    path_file = str(Path.cwd()) + '\/model_prof.tsv'
+
+data = pd.read_csv(path_file, sep='\t', names=['surname', 'Target', 'topic'])
 data['label'] = data['Target'].replace(label_map)
 print('debug data')
 
@@ -123,8 +129,13 @@ print('debug')
 
 # Defining the hyperparameters (optimizer, weights of the classes and the epochs)
 # Define the optimizer
-from transformers import AdamW
-optimizer = AdamW(model.parameters(), lr = 2e-5) 
+# is temporaneal fix
+check_win = True
+if nameos == 'posix':
+    from transformers import AdamWeightDecay
+    optimizer = AdamWeightDecay(model.parameters(), lr = 2e-5)
+    check_win = False
+#end temporaneal fix
 
 import torch.nn as nn
 # Define the loss function
@@ -133,7 +144,7 @@ loss_fn  = nn.CrossEntropyLoss()
 epochs = 5
 
 # Define architecture
-from bert_ml.BERT_arch import BERT_Arch
+from BERT_arch import BERT_Arch
 model_def = BERT_Arch(model)
 # Defining training and evaluation functions
 def train():
@@ -144,13 +155,19 @@ def train():
 #        if step == 3:
 #            break
         batch = [r for r in batch]
-        optimizer.zero_grad()
+        # is temporaneal fix
+        if check_win == False:
+            optimizer.zero_grad()
+        # end temporaneal fix
         outputs = model(input_ids = batch[0], attention_mask = batch[1])
         pred = outputs[1]
         loss = loss_fn(pred, batch[2])
         loss.requires_grad_(True)
         loss.backward()
-        optimizer.step()
+        # is temporaneal fix
+        if check_win == False:
+            optimizer.step()
+        # end temporaneal fix
         # Calculating the running loss for logging purposes
         train_batch_loss = loss.item()
         train_last_loss = train_batch_loss / batch_size
