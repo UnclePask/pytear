@@ -7,6 +7,8 @@ Class convert di metodi statici per convertire i dataframe verso formati file
 '''
 import json
 import pandas as pd
+from pathlib import Path
+from os import name as nameos
 
 class convert(object):
     '''
@@ -61,3 +63,21 @@ class convert(object):
             return dataJSON_pandas
         except:
             return None
+
+    @staticmethod
+    def getPath(io):
+        if nameos == 'nt':
+            if io == 'input':
+                path_string = str(Path.cwd()) + '\\inputFile\\speech-a.tsv'
+            elif io == 'output':
+                path_string = str(Path.cwd()) + '\\outputFile\\speech-b.tsv'
+            else:
+                raise Exception 
+        else:
+            if io == 'input':
+                path_string = str(Path.cwd()) + '\/inputFile\/speech-a.tsv'
+            elif io == 'output':
+                path_string = str(Path.cwd()) + '\/outputFile\/speech-b.tsv'
+            else:
+                raise Exception
+        return path_string
