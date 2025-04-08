@@ -1,7 +1,9 @@
-#begin standard code to import
 from os import name as nameos
-from transformers import pipeline
+from pathlib import Path
+from transformers import pipeline, BertTokenizer, BertModel
 import torch
+import pandas as pd
+#begin standard code to import BERT Model
 unmasker = pipeline('fill-mask', model='bert-base-uncased')
 unmasker("Hello I'm a [MASK] model.")
 [
@@ -36,30 +38,29 @@ unmasker("Hello I'm a [MASK] model.")
       "token_str":"famous"
    }
 ]
-
-from transformers import BertTokenizer, BertModel
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 model = BertModel.from_pretrained('bert-base-uncased')
 text = "Replace me by any text you'd like."
 encoded_input = tokenizer(text, return_tensors='pt')
 output = model(**encoded_input)
-print(output)
+#print(output)
 #end standard code to import
 
-import pandas as pd
-from pathlib import Path
+def __getPathTrainingData():
+    #mappa
+    label_map = {'Fake': 1, 
+                 'True': 0}
+    if nameos == 'nt':
+        path_file = str(Path.cwd()) + '\\main\\bert_ml\\model_prof.tsv'
+    else:
+        path_file = str(Path.cwd()) + '\/main\/bert_ml\/model_prof.tsv'
 
-label_map = {'Fake': 1, 
-             'True': 0}
+    data = pd.read_csv(path_file, sep='\t', names=['surname', 'Target', 'topic'])
+    data['label'] = data['Target'].replace(label_map)
+    print('debug data')
+    return data
 
-if nameos == 'nt':
-    path_file = str(Path.cwd()) + '\\main\\bert_ml\\model_prof.tsv'
-else:
-    path_file = str(Path.cwd()) + '\/model_prof.tsv'
-
-data = pd.read_csv(path_file, sep='\t', names=['surname', 'Target', 'topic'])
-data['label'] = data['Target'].replace(label_map)
-print('debug data')
+data = __getPathTrainingData()
 
 from sklearn.model_selection import train_test_split
 
@@ -74,27 +75,30 @@ val_text, test_text, val_labels, test_labels = train_test_split(temp_text, temp_
                                                     test_size=0.8,
                                                     stratify=temp_labels)
 # Max tokens
-MAX_LENGHT = 500
+MAX_LENGHT = 512
 # Tokenize and encode sequences in the train set
 tokens_train = tokenizer.batch_encode_plus(
     train_text.tolist(),
     max_length = MAX_LENGHT,
-    pad_to_max_length=True,
-    truncation=True
+    padding='max_length',
+    truncation=True,
+    return_attention_mask=True
 )
 # tokenize and encode sequences in the validation set
 tokens_val = tokenizer.batch_encode_plus(
     val_text.tolist(),
     max_length = MAX_LENGHT,
-    pad_to_max_length=True,
-    truncation=True
+    padding='max_length',
+    truncation=True,
+    return_attention_mask=True
 )
 # tokenize and encode sequences in the test set
 tokens_test = tokenizer.batch_encode_plus(
     test_text.tolist(),
     max_length = MAX_LENGHT,
-    pad_to_max_length=True,
-    truncation=True
+    padding='max_length',
+    truncation=True,
+    return_attention_mask=True
 )
 
 # Convert lists to tensors
@@ -125,15 +129,15 @@ val_dataloader = DataLoader(val_data, sampler = val_sampler, batch_size=batch_si
 # Freezing the parameters and defining trainable BERT structure
 for param in model.parameters():
     param.requires_grad = False 
-print('debug')
+#print('debug')
 
 # Defining the hyperparameters (optimizer, weights of the classes and the epochs)
 # Define the optimizer
 # is temporaneal fix
 check_win = True
 if nameos == 'posix':
-    from transformers import AdamWeightDecay
-    optimizer = AdamWeightDecay(model.parameters(), lr = 2e-5)
+    from transformers import AdamW
+    optimizer = AdamW(model.parameters(), lr = 2e-5)
     check_win = False
 #end temporaneal fix
 
@@ -212,7 +216,6 @@ best_valid_loss = float('inf')
 # empty lists to store training and validation loss of each epoch
 train_losses=[]                   
 valid_losses=[]
-#with alive_bar(epochs) as bar:
 for epoch in range(epochs):
     print('Training {:} di {:}'.format(epoch + 1, epochs), flush=True)
     train_loss = train()
@@ -225,4 +228,3 @@ for epoch in range(epochs):
 
     print(f'\nTraining Loss: {train_loss:.9f}')
     print(f'Validation Loss: {valid_loss:.9f}')
-#       bar()
