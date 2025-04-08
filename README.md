@@ -1,7 +1,7 @@
 # PyTeAR
 
 
-#Warning use python 3.11 or less, please read -> https://github.com/explosion/spaCy/issues/13658
+# Warning use python 3.11 or less, please read -> https://github.com/explosion/spaCy/issues/13658
 
 Python Text Analysis Routine, pipeline for identify propaganda in the speechs or articles.
 In this Alpha 0 version the pipeline support only English language
