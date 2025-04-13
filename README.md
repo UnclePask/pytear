@@ -45,17 +45,17 @@ Header of spheech-a.tsv:
 <br>
 Header of spheech-b.csv:
 <ol>
-  <li>name, from master data</li>
+  ...
   <li>surname</li>
-  <li>holiday, from master data</li>
-  <li>death, from master data</li>
-  <li>nationality, from masterdata</li>
-  <li>political_party, from masterdata</li>
+  <li>holiday, from master data (DEPRECATE Will be deleted)</li>
+  <li>death, from master data (DEPRECATE Will be deleted)</li>
+  <li>nationality, from masterdata (DEPRECATE Will be deleted)</li>
+  <li>political_party, from masterdata (DEPRECATE Will be deleted)</li>
   <li>value</li>
   <li>topic</li>
-  <li>title, synth STEP 1</li>
-  <li>metadata, synth STEP 1</li>
-  <li>source, synth STEP 1</li>
+  <li>title, synth STEP 1 (DEPRECATE Will be deleted)</li>
+  <li>metadata, synth STEP 1 (DEPRECATE Will be deleted)</li>
+  <li>source, synth STEP 1 (DEPRECATE Will be deleted)</li>
   <li>FleschReadIndex, synth STEP 2</li>
   <li>SmogIndex, synth STEP 2</li>
   <li>PolarityScore, synth STEP 2</li> 
