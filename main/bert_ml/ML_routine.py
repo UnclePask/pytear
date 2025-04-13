@@ -1,6 +1,14 @@
+'''
+Update on 13 march 2025
+
+@author: pasquale
+'''
 from os import name as nameos
 from pathlib import Path
 from transformers import pipeline, BertTokenizer, BertModel
+from bitsandbytes.optim import AdamW
+from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
+from sklearn.model_selection import train_test_split
 import torch
 import pandas as pd
 #begin standard code to import BERT Model
@@ -43,8 +51,21 @@ model = BertModel.from_pretrained('bert-base-uncased')
 text = "Replace me by any text you'd like."
 encoded_input = tokenizer(text, return_tensors='pt')
 output = model(**encoded_input)
-#print(output)
-#end standard code to import
+#end standard code to import BERT Model
+
+#START parameters
+# Define Max lenght tokens MAX 512
+MAX_LENGHT = 512
+# Define batch size
+batch_size = 32
+# Define the loss function
+loss_fn  = torch.nn.CrossEntropyLoss()
+# Defining the hyperparameters
+# Define the optimizer
+optimizer = AdamW(model.parameters(), lr = 2e-5)
+# Define Number of training epochs (default 5)
+epochs = 5
+#END define paramenters
 
 def __getPathTrainingData():
     #mappa
@@ -53,7 +74,7 @@ def __getPathTrainingData():
     if nameos == 'nt':
         path_file = str(Path.cwd()) + '\\main\\bert_ml\\model_prof.tsv'
     else:
-        path_file = str(Path.cwd()) + '\/main\/bert_ml\/model_prof.tsv'
+        path_file = str(Path.cwd()) + '/main/bert_ml/model_prof.tsv'
 
     data = pd.read_csv(path_file, sep='\t', names=['surname', 'Target', 'topic'])
     data['label'] = data['Target'].replace(label_map)
@@ -61,8 +82,6 @@ def __getPathTrainingData():
     return data
 
 data = __getPathTrainingData()
-
-from sklearn.model_selection import train_test_split
 
 # Train-temp split
 train_text, temp_text, train_labels, temp_labels = train_test_split(data['topic'], data['label'],
@@ -74,8 +93,7 @@ val_text, test_text, val_labels, test_labels = train_test_split(temp_text, temp_
                                                     random_state=2018,
                                                     test_size=0.8,
                                                     stratify=temp_labels)
-# Max tokens
-MAX_LENGHT = 512
+
 # Tokenize and encode sequences in the train set
 tokens_train = tokenizer.batch_encode_plus(
     train_text.tolist(),
@@ -112,13 +130,9 @@ val_y = torch.tensor(val_labels.tolist())
 
 test_seq = torch.tensor(tokens_test['input_ids'])
 test_mask = torch.tensor(tokens_test['attention_mask'])
-test_y = torch.tensor(test_labels.tolist())
+test_y = torch.tensor(test_labels.tolist())                                             
 
-#define a batch size
-batch_size = 32                                               
-
-from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
-
+#Costruction of tensors train data and valuating data
 train_data = TensorDataset(train_seq, train_mask, train_y)    
 train_sampler = RandomSampler(train_data)                     
 train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=batch_size)
@@ -128,26 +142,9 @@ val_dataloader = DataLoader(val_data, sampler = val_sampler, batch_size=batch_si
 
 # Freezing the parameters and defining trainable BERT structure
 for param in model.parameters():
-    param.requires_grad = False 
-#print('debug')
+    param.requires_grad = False
 
-# Defining the hyperparameters (optimizer, weights of the classes and the epochs)
-# Define the optimizer
-# is temporaneal fix
-check_win = True
-if nameos == 'posix':
-    from transformers import AdamW
-    optimizer = AdamW(model.parameters(), lr = 2e-5)
-    check_win = False
-#end temporaneal fix
-
-import torch.nn as nn
-# Define the loss function
-loss_fn  = nn.CrossEntropyLoss()
-# Number of training epochs
-epochs = 5
-
-# Define architecture
+# Constructor of hometrained Model
 from BERT_arch import BERT_Arch
 model_def = BERT_Arch(model)
 # Defining training and evaluation functions
@@ -156,25 +153,18 @@ def train():
     model_def.train()
     total_loss = 0
     for step, batch in enumerate(train_dataloader):
-#        if step == 3:
-#            break
         batch = [r for r in batch]
-        # is temporaneal fix
-        if check_win == False:
-            optimizer.zero_grad()
-        # end temporaneal fix
+        optimizer.zero_grad()
         outputs = model(input_ids = batch[0], attention_mask = batch[1])
         pred = outputs[1]
         loss = loss_fn(pred, batch[2])
         loss.requires_grad_(True)
         loss.backward()
-        # is temporaneal fix
-        if check_win == False:
-            optimizer.step()
-        # end temporaneal fix
+        optimizer.step()
         # Calculating the running loss for logging purposes
         train_batch_loss = loss.item()
         train_last_loss = train_batch_loss / batch_size
+        total_loss = total_loss + train_last_loss
         print('Training batch {} last loss: {}'.format(step + 1, train_last_loss), flush=True)
     
     # Logging epoch-wise training loss
@@ -189,21 +179,18 @@ def evaluate():
     for step,batch in enumerate(val_dataloader):
         batch = [t for t in batch]
         # We don't need gradients for testing
-        with torch.no_grad():
-            outputs = model(input_ids = batch[0], attention_mask = batch[1])   # Push the batch to GPU
-        
+        #with torch.no_grad():
+        outputs = model(input_ids = batch[0], attention_mask = batch[1])   # Push the batch to GPU
         # Calculating total batch loss using the logits and labels
         logits = outputs[1]
         loss = loss_fn(logits, batch[2])
         loss.requires_grad_(True)
         test_batch_loss = loss.item()
-        
         test_last_loss = test_batch_loss / batch_size
         print('Testing batch {} loss: {}'.format(step + 1, test_last_loss), flush=True)
-        
         # Comparing the predicted target with the labels in the batch
-        # maledetto give me even zero
-        correct = correct + (logits.argmax(1) == batch[2]).sum().item()
+        # maledetto give me even zero -> capire se per via che faccio troppi pochi epochs
+        correct = correct + (logits.argmax() == batch[2]).sum().item()
         print("Testing accuracy: ",correct/((step + 1) * batch_size))
         
     # compute the validation loss of the epoch    
@@ -216,6 +203,7 @@ best_valid_loss = float('inf')
 # empty lists to store training and validation loss of each epoch
 train_losses=[]                   
 valid_losses=[]
+#sistemo i pesi w0 ...wn per il dragone
 for epoch in range(epochs):
     print('Training {:} di {:}'.format(epoch + 1, epochs), flush=True)
     train_loss = train()
