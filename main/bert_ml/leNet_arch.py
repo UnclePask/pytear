@@ -3,11 +3,10 @@ Created on 20 apr 2025
 
 @author: pasquale
 '''
-from ast import Module
 import torch.nn as nn
 from torch import flatten
 
-class leNet_arch(Module):
+class leNet_arch(nn.Module):
 	
 	def __init__(self, numChannels, classes):
 		super(leNet_arch, self).__init__()
