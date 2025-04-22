@@ -35,10 +35,6 @@ class step_2(object):
     '''
     
     def __init__(self, speech_df):
-        '''
-        Constructor 
-        fileSpeech: Path dei file di input
-        '''
         self.model = en_core_web_trf.load()
         self.sid = SentimentIntensityAnalyzer()
         try:
@@ -63,9 +59,6 @@ class step_2(object):
             print(f'\nError (5): reindex of data frame function failed in node 2 \n\n')
    
     def __neighbor_to_one(self, my_sent_score):
-        '''
-        Metodo privato che restituisce la leva emotiva del discorso
-        '''
         ref_score = abs(my_sent_score['pos']) - abs(my_sent_score['neg'])
         if ref_score == 0:
             if my_sent_score['neu'] > 0.75:
@@ -86,9 +79,6 @@ class step_2(object):
             return 'Fuori scala'
             
     def text_analysis(self):
-        '''
-        Metodo principale che effettua la text analysis attraverso il modello en_core_web_trf 
-        '''
         try:
             line_check_exception = 0
             TEXT_POS = self.df.columns.get_loc('topic')
@@ -105,15 +95,12 @@ class step_2(object):
             progress_index = self.df.shape[0]
             with alive_bar(progress_index) as bar:
                 for i, row in self.df.iterrows():
-    #                if i == 3:
-    #                    break
                     line_check_exception = i
                     text = row.values[TEXT_POS]
                     doc = self.model(text)
                     
                     num_words = textstatistics().lexicon_count(text, True)
                     num_token = len(doc.ents)
-    #                num_sent = textstatistics().sentence_count(text)
                     language = doc.vocab.lang
                     try:
                         ASL = 1.025 * (num_words / num_token)
@@ -132,21 +119,18 @@ class step_2(object):
                         smog_index = textstatistics().smog_index(text)
                         row.values[SMOG_POS] = round(smog_index, 2)
                         sentiment_score = self.sid.polarity_scores(text).values().mapping
-    #                x = sentiment_score.mapping
-    #                y = x['neg']
                         row.values[POLS_POS] = round(sentiment_score['compound'], 2)
                         row.values[EMPS_POS] = round(sentiment_score['pos'], 2)
                         row.values[UGLY_POS] = round(sentiment_score['neg'], 2)
                         row.values[STYL_POS] = self.__neighbor_to_one(sentiment_score)
                         row.values[ABST_POS] = make.summarize.createAbstract(text)
                         row.values[KEYW_POS] = make.summarize.extractKeywords(text, language)
-                        
                     else:
                         row.values[STYL_POS] = 'Non classificabile'
                         row.values[ABST_POS] = 'Non classificabile'
                         
                     data.append(row)
-                    tb3 = pd.DataFrame(data, columns=['name', 'surname', 'holiday', 'death', 'nationality', 'political_party', 'value', 'topic', 'title', 'metadata', 'source', 'FleschReadIndex', 'SmogIndex', 'PolarityScore', 'EmpathyScore', 'UglyScore', 'StyleText', 'Abstract', 'Keywords'])
+                    tb3 = pd.DataFrame(data, columns=['fullName', 'whoIs', 'surname', 'topic', 'FleschReadIndex', 'SmogIndex', 'PolarityScore', 'EmpathyScore', 'UglyScore', 'StyleText', 'Abstract', 'Keywords'])
                     bar()
 
             return tb3
