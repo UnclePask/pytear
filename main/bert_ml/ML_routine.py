@@ -9,6 +9,7 @@ from transformers import pipeline, BertTokenizer, BertModel
 from bitsandbytes.optim import AdamW
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from sklearn.model_selection import train_test_split
+from BERT_arch import BERT_Arch
 import torch
 import pandas as pd
 #begin standard code to import BERT Model
@@ -20,30 +21,6 @@ unmasker("Hello I'm a [MASK] model.")
       "score":0.22748498618602753,
       "token":2581,
       "token_str":"male"
-   },
-   {
-      "sequence":"[CLS] Hello I'm a fashion model. [SEP]",
-      "score":0.09146175533533096,
-      "token":4633,
-      "token_str":"fashion"
-   },
-   {
-      "sequence":"[CLS] Hello I'm a new model. [SEP]",
-      "score":0.05823173746466637,
-      "token":1207,
-      "token_str":"new"
-   },
-   {
-      "sequence":"[CLS] Hello I'm a super model. [SEP]",
-      "score":0.04488750174641609,
-      "token":7688,
-      "token_str":"super"
-   },
-   {
-      "sequence":"[CLS] Hello I'm a famous model. [SEP]",
-      "score":0.03271442651748657,
-      "token":2505,
-      "token_str":"famous"
    }
 ]
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
@@ -78,7 +55,6 @@ def __getPathTrainingData():
 
     data = pd.read_csv(path_file, sep='\t', names=['surname', 'Target', 'topic'])
     data['label'] = data['Target'].replace(label_map)
-    print('debug data')
     return data
 
 data = __getPathTrainingData()
@@ -143,9 +119,7 @@ val_dataloader = DataLoader(val_data, sampler = val_sampler, batch_size=batch_si
 # Freezing the parameters and defining trainable BERT structure
 for param in model.parameters():
     param.requires_grad = False
-
 # Constructor of hometrained Model
-from BERT_arch import BERT_Arch
 model_def = BERT_Arch(model)
 # Defining training and evaluation functions
 def train():
