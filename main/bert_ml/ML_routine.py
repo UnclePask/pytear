@@ -1,5 +1,5 @@
 '''
-Update on 22 march 2025
+Update on 22 apr 2025
 
 @author: pasquale
 '''
@@ -11,7 +11,6 @@ from torch.utils.data import TensorDataset, DataLoader, RandomSampler, Sequentia
 from sklearn.model_selection import train_test_split
 import torch
 import pandas as pd
-from tensorflow.python.ops.distributions.kullback_leibler import cross_entropy
 #begin standard code to import BERT Model
 unmasker = pipeline('fill-mask', model='bert-base-uncased')
 unmasker("Hello I'm a [MASK] model.")
@@ -63,7 +62,7 @@ batch_size = 32
 loss_fn  = torch.nn.CrossEntropyLoss()
 # Defining the hyperparameters
 # Define the optimizer
-optimizer = AdamW(model.parameters(), lr = 2e-5)
+optimizer = AdamW(model.parameters(), lr = 1e-5)
 # Define Number of training epochs (default 5)
 epochs = 200
 #END define paramenters
@@ -155,20 +154,18 @@ def train():
     total_loss = 0
     for step, batch in enumerate(train_dataloader):
         batch = [r for r in batch]
+        sent_id, mask, labels = batch
         optimizer.zero_grad()
-        outputs = model(input_ids = batch[0], attention_mask = batch[1])
-        pred = outputs[1]
-        loss = loss_fn(pred, batch[2])
+        pred = model_def(sent_id, mask)
+        loss = loss_fn(pred, labels)
         loss.requires_grad_(True)
         loss.backward()
         optimizer.step()
-        # Calculating the running loss for logging purposes
         train_batch_loss = loss.item()
         train_last_loss = train_batch_loss / batch_size
         total_loss = total_loss + train_last_loss
         print('Training batch {} last loss: {}'.format(step + 1, train_last_loss), flush=True)
     
-    # Logging epoch-wise training loss
     print(f"\nTraining epoch {epoch + 1} loss: ", train_last_loss) 
     avg_loss = total_loss / len(train_dataloader)
     return avg_loss
@@ -177,25 +174,18 @@ def evaluate():
     print("\nEvaluating...")
     model_def.eval()
     total_loss = 0
-    val_loss = 0
-    correct = 0
     for step, batch in enumerate(val_dataloader):
         batch = [t for t in batch]
         sent_id, mask, labels = batch
-        # deactivate autograd
         with torch.no_grad():
-            # model predictions
-#            for data in val_dataloader:
-            b_out = model(sent_id, mask)
-            # compute the validation loss between actual and predicted values
-            correct = correct + (b_out.last_hidden_state == labels).sum().item()
-            val_loss = val_loss + loss_fn(b_out.last_hidden_state, labels).item() * labels.size(0)
-            total_loss = total_loss + len(labels)
-            
-    # compute the validation loss of the epoch    
-    val_accuracy = 100 * correct / total_loss
-    print(f"\nTesting epoch {epoch + 1} Accuracy: ", val_accuracy)
-    avg_loss = val_accuracy / len(val_dataloader.dataset)
+            pred = model_def(sent_id, mask)
+            loss = loss_fn(pred, labels)
+            value_batch_loss = loss.item()
+            total_loss = total_loss + value_batch_loss
+            print('Evaluating batch {} last loss: {}'.format(step + 1, value_batch_loss), flush=True)
+             
+    print(f"\nTesting epoch {epoch + 1} Accuracy: ", loss.item())
+    avg_loss = total_loss / len(val_dataloader)
     return avg_loss
   
 # Train and predict
@@ -203,7 +193,6 @@ best_valid_loss = float('inf')
 # empty lists to store training and validation loss of each epoch
 train_losses=[]                   
 valid_losses=[]
-#sistemo i pesi w0 ...wn per il dragone
 for epoch in range(epochs):
     print('Training {:} di {:}'.format(epoch + 1, epochs), flush=True)
     train_loss = train()
