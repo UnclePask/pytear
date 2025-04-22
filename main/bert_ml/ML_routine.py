@@ -1,5 +1,5 @@
 '''
-Update on 13 march 2025
+Update on 22 march 2025
 
 @author: pasquale
 '''
@@ -11,6 +11,7 @@ from torch.utils.data import TensorDataset, DataLoader, RandomSampler, Sequentia
 from sklearn.model_selection import train_test_split
 import torch
 import pandas as pd
+from tensorflow.python.ops.distributions.kullback_leibler import cross_entropy
 #begin standard code to import BERT Model
 unmasker = pipeline('fill-mask', model='bert-base-uncased')
 unmasker("Hello I'm a [MASK] model.")
@@ -64,7 +65,7 @@ loss_fn  = torch.nn.CrossEntropyLoss()
 # Define the optimizer
 optimizer = AdamW(model.parameters(), lr = 2e-5)
 # Define Number of training epochs (default 5)
-epochs = 5
+epochs = 200
 #END define paramenters
 
 def __getPathTrainingData():
@@ -174,28 +175,27 @@ def train():
 
 def evaluate():
     print("\nEvaluating...")
-    model_def.eval()                                    # Deactivate dropout layers
+    model_def.eval()
+    total_loss = 0
+    val_loss = 0
     correct = 0
-    for step,batch in enumerate(val_dataloader):
+    for step, batch in enumerate(val_dataloader):
         batch = [t for t in batch]
-        # We don't need gradients for testing
-        #with torch.no_grad():
-        outputs = model(input_ids = batch[0], attention_mask = batch[1])   # Push the batch to GPU
-        # Calculating total batch loss using the logits and labels
-        logits = outputs[1]
-        loss = loss_fn(logits, batch[2])
-        loss.requires_grad_(True)
-        test_batch_loss = loss.item()
-        test_last_loss = test_batch_loss / batch_size
-        print('Testing batch {} loss: {}'.format(step + 1, test_last_loss), flush=True)
-        # Comparing the predicted target with the labels in the batch
-        # maledetto give me even zero -> capire se per via che faccio troppi pochi epochs
-        correct = correct + (logits.argmax() == batch[2]).sum().item()
-        print("Testing accuracy: ",correct/((step + 1) * batch_size))
-        
+        sent_id, mask, labels = batch
+        # deactivate autograd
+        with torch.no_grad():
+            # model predictions
+#            for data in val_dataloader:
+            b_out = model(sent_id, mask)
+            # compute the validation loss between actual and predicted values
+            correct = correct + (b_out.last_hidden_state == labels).sum().item()
+            val_loss = val_loss + loss_fn(b_out.last_hidden_state, labels).item() * labels.size(0)
+            total_loss = total_loss + len(labels)
+            
     # compute the validation loss of the epoch    
-    print(f"\nTesting epoch {epoch + 1} last loss: ",test_last_loss)         
-    avg_loss = correct / len(val_dataloader) 
+    val_accuracy = 100 * correct / total_loss
+    print(f"\nTesting epoch {epoch + 1} Accuracy: ", val_accuracy)
+    avg_loss = val_accuracy / len(val_dataloader.dataset)
     return avg_loss
   
 # Train and predict
@@ -208,9 +208,10 @@ for epoch in range(epochs):
     print('Training {:} di {:}'.format(epoch + 1, epochs), flush=True)
     train_loss = train()
     valid_loss = evaluate()
+    print("\nBest Valid Loss {:} Actual loss {:}".format(best_valid_loss, valid_loss))
     if valid_loss < best_valid_loss:
         best_valid_loss = valid_loss
-        torch.save(model.state_dict(), 'unclepask_propaganda_alpha5.pt')
+        torch.save(model.state_dict(), 'unclepask_propaganda_alpha6.pt')
     train_losses.append(train_loss)
     valid_losses.append(valid_loss)
 
