@@ -74,7 +74,7 @@ def __getPathTrainingData():
     if nameos == 'nt':
         path_file = str(Path.cwd()) + '\\main\\bert_ml\\model_prof.tsv'
     else:
-        path_file = str(Path.cwd()) + '/main/bert_ml/model_prof.tsv'
+        path_file = str(Path.cwd()) + '/model_prof.tsv'
 
     data = pd.read_csv(path_file, sep='\t', names=['surname', 'Target', 'topic'])
     data['label'] = data['Target'].replace(label_map)
