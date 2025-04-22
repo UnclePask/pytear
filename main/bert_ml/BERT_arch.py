@@ -14,8 +14,8 @@ class BERT_Arch(nn.Module):
         self.bert = bert
         self.dropout = nn.Dropout(0.1)
         self.relu =  nn.ReLU()                  
-        self.fc1 = nn.Linear(32,16)         
-        self.fc2 = nn.Linear(16,2)        
+        self.fc1 = nn.Linear(768,512)         
+        self.fc2 = nn.Linear(512,2)        
         self.softmax = nn.LogSoftmax(dim=1)  
     
     def forward(self, sent_id, mask):           
