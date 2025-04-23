@@ -79,7 +79,7 @@ class step_1:
         print('\n\n(1) Running - Web Scraping:\n[Abort] - Sorry i need to fix it :-) ')
         # end of temp msg
 #        agent={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'}
-#        url='https://www.google.com/search?q='
+#        url=''
 #        tb2 = pd.DataFrame({})
 #        Data = [ ]
 #        tb0 = self.__phase0()
@@ -114,15 +114,15 @@ class step_1:
 #                        link = allData[0].find('a').get('href')
 #                        if(link is not None):
 #                            try:
-#                                l["title"]=allData[0].find('h3',{"class":"DKV0Md"}).text
+#                                l["title"]=allData[0].find('h3',{"class":""}).text
 #                            except:
 #                               l["title"]=None
 #                           try:
-#                                l["metadata"]=allData[0].find("div",{"class":"VwiC3b"}).text
+#                                l["metadata"]=allData[0].find("div",{"class":""}).text
 #                            except:
 #                                l["metadata"]=None
 #                                l["source"]=None
-#                                l["source"]=allData[0].find("span",{"class":"VuuXrf"}).text
+#                                l["source"]=allData[0].find("span",{"class":""}).text
 #                            except:
 #                            try:
 #                
