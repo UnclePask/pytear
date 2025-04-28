@@ -1,5 +1,5 @@
 '''
-Update on 22 apr 2025
+Update on 28 apr 2025
 
 @author: pasquale
 '''
@@ -13,7 +13,7 @@ from BERT_arch import BERT_Arch
 import torch
 import pandas as pd
 #begin standard code to import BERT Model
-unmasker = pipeline('fill-mask', model='bert-base-uncased')
+unmasker = pipeline('fill-mask', model='bert-base-cased')
 unmasker("Hello I'm a [MASK] model.")
 [
    {
@@ -23,8 +23,8 @@ unmasker("Hello I'm a [MASK] model.")
       "token_str":"male"
    }
 ]
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertModel.from_pretrained('bert-base-uncased')
+tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
+model = BertModel.from_pretrained('bert-base-cased')
 text = "Replace me by any text you'd like."
 encoded_input = tokenizer(text, return_tensors='pt')
 output = model(**encoded_input)
@@ -128,6 +128,7 @@ def train():
     total_loss = 0
     for step, batch in enumerate(train_dataloader):
         batch = [r for r in batch]
+        #ids =0 att mask =1 label =2 
         sent_id, mask, labels = batch
         optimizer.zero_grad()
         pred = model_def(sent_id, mask)
@@ -149,6 +150,7 @@ def evaluate():
     model_def.eval()
     total_loss = 0
     for step, batch in enumerate(val_dataloader):
+        #ids =0 att mask =1 label =2 
         batch = [t for t in batch]
         sent_id, mask, labels = batch
         with torch.no_grad():
