@@ -172,7 +172,7 @@ for epoch in range(epochs):
     train_loss = train()
     valid_loss = evaluate()
     print("\nBest Valid Loss {:} Actual loss {:}".format(best_valid_loss, valid_loss))
-    if valid_loss < best_valid_loss:
+    if valid_loss <= best_valid_loss:
         best_valid_loss = valid_loss
         torch.save(model.state_dict(), 'unclepask_propaganda_alpha6.pt')
     train_losses.append(train_loss)
