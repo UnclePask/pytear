@@ -25,7 +25,7 @@ class step_3(object):
             print('\nError (5): reindex of data frame function failed in the node 3 \n\n')
         
         try:
-            self.path = '../unclepask_propaganda_alpha5.pt'
+            self.path = '../unclepask_propaganda_alpha6.pt'
             self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
             self.bert = BertModel.from_pretrained('bert-base-uncased')
             self.uncle_pask = torch.load(self.path)
