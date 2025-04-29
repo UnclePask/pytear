@@ -1,5 +1,5 @@
 '''
-Update on 28 apr 2025
+Update on 22 apr 2025
 
 @author: pasquale
 '''
@@ -13,16 +13,16 @@ from BERT_arch import BERT_Arch
 import torch
 import pandas as pd
 #begin standard code to import BERT Model
-unmasker = pipeline('fill-mask', model='bert-base-cased')
-unmasker("Hello I'm a [MASK] model.")
-[
-   {
-      "sequence":"[CLS] Hello I'm a male model. [SEP]",
-      "score":0.22748498618602753,
-      "token":2581,
-      "token_str":"male"
-   }
-]
+#unmasker = pipeline('fill-mask', model='bert-base-cased')
+#unmasker("Hello I'm a [MASK] model.")
+#[
+#   {
+#      "sequence":"[CLS] Hello I'm a male model. [SEP]",
+#      "score":0.22748498618602753,
+#      "token":2581,
+#      "token_str":"male"
+#   }
+#]
 tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
 model = BertModel.from_pretrained('bert-base-cased')
 text = "Replace me by any text you'd like."
@@ -32,7 +32,7 @@ output = model(**encoded_input)
 
 #START parameters
 # Define Max lenght tokens MAX 512
-MAX_LENGHT = 512
+MAX_LENGHT = 128
 # Define batch size
 batch_size = 32
 # Define the loss function
@@ -41,7 +41,7 @@ loss_fn  = torch.nn.CrossEntropyLoss()
 # Define the optimizer
 optimizer = AdamW(model.parameters(), lr = 1e-5)
 # Define Number of training epochs (default 5)
-epochs = 200
+epochs = 5
 #END define paramenters
 
 def __getPathTrainingData():
@@ -176,7 +176,7 @@ for epoch in range(epochs):
     print("\nBest Valid Loss {:} Actual loss {:}".format(best_valid_loss, valid_loss))
     if valid_loss <= best_valid_loss:
         best_valid_loss = valid_loss
-        torch.save(model.state_dict(), 'unclepask_propaganda_alpha6.pt')
+        torch.save(model_def.state_dict(), 'unclepask_propaganda_alpha6.pt')
     train_losses.append(train_loss)
     valid_losses.append(valid_loss)
 
