@@ -110,7 +110,7 @@ for param in model_def.parameters():
     param.requires_grad = False
 # Defining training and evaluation functions
 def train():
-#    model.enable_input_require_grads()
+#    model_def.enable_input_require_grads()
     model_def.train()
     total_loss = 0
     for step, batch in enumerate(train_dataloader):
