@@ -1,11 +1,11 @@
 '''
-Update on 22 apr 2025
+Update on 29 apr 2025
 
 @author: pasquale
 '''
 from os import name as nameos
 from pathlib import Path
-from transformers import pipeline, BertTokenizer, BertModel
+from transformers import BertTokenizer, BertModel
 from bitsandbytes.optim import AdamW
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from sklearn.model_selection import train_test_split
@@ -13,21 +13,8 @@ from BERT_arch import BERT_Arch
 import torch
 import pandas as pd
 #begin standard code to import BERT Model
-#unmasker = pipeline('fill-mask', model='bert-base-cased')
-#unmasker("Hello I'm a [MASK] model.")
-#[
-#   {
-#      "sequence":"[CLS] Hello I'm a male model. [SEP]",
-#      "score":0.22748498618602753,
-#      "token":2581,
-#      "token_str":"male"
-#   }
-#]
 tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
 model = BertModel.from_pretrained('bert-base-cased')
-text = "Replace me by any text you'd like."
-encoded_input = tokenizer(text, return_tensors='pt')
-output = model(**encoded_input)
 #end standard code to import BERT Model
 
 #START parameters
@@ -38,10 +25,12 @@ batch_size = 32
 # Define the loss function
 loss_fn  = torch.nn.CrossEntropyLoss()
 # Defining the hyperparameters
+# Constructor of hometrained Model
+model_def = BERT_Arch(model)
 # Define the optimizer
-optimizer = AdamW(model.parameters(), lr = 1e-5)
+optimizer = AdamW(model_def.parameters(), lr = 1e-5)
 # Define Number of training epochs (default 5)
-epochs = 5
+epochs = 200
 #END define paramenters
 
 def __getPathTrainingData():
@@ -117,10 +106,8 @@ val_sampler = SequentialSampler(val_data)
 val_dataloader = DataLoader(val_data, sampler = val_sampler, batch_size=batch_size)
 
 # Freezing the parameters and defining trainable BERT structure
-for param in model.parameters():
+for param in model_def.parameters():
     param.requires_grad = False
-# Constructor of hometrained Model
-model_def = BERT_Arch(model)
 # Defining training and evaluation functions
 def train():
 #    model.enable_input_require_grads()
@@ -141,7 +128,7 @@ def train():
         total_loss = total_loss + train_last_loss
         print('Training batch {} last loss: {}'.format(step + 1, train_last_loss), flush=True)
     
-    print(f"\nTraining epoch {epoch + 1} loss: ", train_last_loss) 
+    print(f"\nTraining epoch {epoch + 1} or loss: ", train_last_loss)
     avg_loss = total_loss / len(train_dataloader)
     return avg_loss
 
@@ -170,7 +157,7 @@ best_valid_loss = float('inf')
 train_losses=[]                   
 valid_losses=[]
 for epoch in range(epochs):
-    print('Training {:} di {:}'.format(epoch + 1, epochs), flush=True)
+    print('\nTraining {:} di {:}'.format(epoch + 1, epochs), flush=True)
     train_loss = train()
     valid_loss = evaluate()
     print("\nBest Valid Loss {:} Actual loss {:}".format(best_valid_loss, valid_loss))
