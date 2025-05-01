@@ -1,5 +1,5 @@
 '''
-Update on 29 apr 2025
+Update on 22 apr 2025
 
 @author: pasquale
 '''
@@ -28,7 +28,7 @@ loss_fn  = torch.nn.CrossEntropyLoss()
 # Constructor of hometrained Model
 model_def = BERT_Arch(model)
 # Define the optimizer
-optimizer = AdamW(model_def.parameters(), lr = 1e-5)
+optimizer = AdamW(model_def.parameters(), lr = 2e-5)
 # Define Number of training epochs (default 5)
 epochs = 200
 #END define paramenters
@@ -56,7 +56,7 @@ train_text, temp_text, train_labels, temp_labels = train_test_split(data['topic'
 # Validation-Test split
 val_text, test_text, val_labels, test_labels = train_test_split(temp_text, temp_labels,
                                                     random_state=2018,
-                                                    test_size=0.8,
+                                                    test_size=0.5,
                                                     stratify=temp_labels)
 
 # Tokenize and encode sequences in the train set
