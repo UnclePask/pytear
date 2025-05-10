@@ -82,15 +82,15 @@ tokens_test = tokenizer.batch_encode_plus(
 # Conversione in tensori con dtype corretto
 train_seq = torch.tensor(tokens_train['input_ids'])
 train_mask = torch.tensor(tokens_train['attention_mask'])
-train_y = torch.tensor(train_labels.values, dtype=torch.long)
+train_y = torch.tensor(train_labels.tolist(), dtype=torch.long)
 
 val_seq = torch.tensor(tokens_val['input_ids'])
 val_mask = torch.tensor(tokens_val['attention_mask'])
-val_y = torch.tensor(val_labels.values, dtype=torch.long)
+val_y = torch.tensor(val_labels.tolist(), dtype=torch.long)
 
 test_seq = torch.tensor(tokens_test['input_ids'])
 test_mask = torch.tensor(tokens_test['attention_mask'])
-test_y = torch.tensor(test_labels.values, dtype=torch.long)
+test_y = torch.tensor(test_labels.tolist(), dtype=torch.long)
 
 # Creazione del dataset per l'addestramento e la valutazione
 train_data = TensorDataset(train_seq, train_mask, train_y)
