@@ -1,5 +1,5 @@
 '''
-Created on 4 gen 2025
+Update on 11 May 2025
 
 @author: pasquale
 '''
@@ -13,7 +13,7 @@ class BERT_Arch(nn.Module):
         self.relu =  nn.ReLU()                  
         self.fc1 = nn.Linear(768,512)         
         self.fc2 = nn.Linear(512,2)        
-        self.softmax = nn.LogSoftmax(dim=1)  
+ #       self.softmax = nn.LogSoftmax(dim=1)  
     
     def forward(self, sent_id, mask):           
         cls_hs = self.bert(sent_id, attention_mask=mask)['pooler_output']
@@ -21,5 +21,20 @@ class BERT_Arch(nn.Module):
         nex = self.relu(nex)
         nex = self.dropout(nex)
         nex = self.fc2(nex)                       
-        nex = self.softmax(nex)                   
+#        nex = self.softmax(nex)                   
         return nex
+
+    def set_all_trainable(self):
+        for param in self.parameters():
+            param.requires_grad = True
+
+    def set_all_untrainable(self):
+        for param in self.parameters():
+            param.requires_grad = False
+
+    def set_classifier_trainable(self):
+        self.set_all_untrainable()
+        for param in self.fc1.parameters():
+            param.requires_grad = True
+        for param in self.fc2.parameters():
+            param.requires_grad = True
