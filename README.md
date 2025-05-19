@@ -31,42 +31,11 @@ Output transactional data file will be generated in CSV format with semicolon se
 <code>
 --------------------------       --------------------------
 | INPUT:                 |       | OUTPUT:                |
-|       spheech-a.tsv    |   ->  |       spheech-b.Csv    |
-|       anagraphic.json  |       |                        |
+|     spheech-a.tsv      |   ->  |      spheech-b.Csv     |
+|    anagraphic.json     |       |    (Report analysis)   |
 --------------------------       --------------------------
 </code>
-<br>
-Header of spheech-a.tsv:
-<ol>
-  <li>surname (author of topic)</li>
-  <li>values (0 or 1 for the future training)</li>
-  <li>topic (speech or news)</li>
-</ol>
-<br>
-Header of spheech-b.csv:
-<ol>
-  ...
-  <li>surname</li>
-  <li>holiday, from master data (DEPRECATE Will be deleted)</li>
-  <li>death, from master data (DEPRECATE Will be deleted)</li>
-  <li>nationality, from masterdata (DEPRECATE Will be deleted)</li>
-  <li>political_party, from masterdata (DEPRECATE Will be deleted)</li>
-  <li>value</li>
-  <li>topic</li>
-  <li>title, synth STEP 1 (DEPRECATE Will be deleted)</li>
-  <li>metadata, synth STEP 1 (DEPRECATE Will be deleted)</li>
-  <li>source, synth STEP 1 (DEPRECATE Will be deleted)</li>
-  <li>FleschReadIndex, synth STEP 2</li>
-  <li>SmogIndex, synth STEP 2</li>
-  <li>PolarityScore, synth STEP 2</li> 
-  <li>EmpathyScore, synth STEP 2</li>
-  <li>UglyScore, synth STEP 2</li>
-  <li>StyleText, calc based on the Polarity Score</li>
-  <li>Abstract, synth STEP 2</li>
-  <li>Keywords, synth STEP 2</li> 
-  <li>PropDetectionSynth, synth STEP 3</li>
-  <li>PropDetectionNoSynth, synth STEP 3</li>
-</ol>
+
 
 In the future, I would like to implement an OpenAI-based model to integrate text analysis with author profiling and graphic propaganda analysis.
 
