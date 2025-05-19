@@ -38,3 +38,4 @@ class BERT_Arch(nn.Module):
             param.requires_grad = True
         for param in self.fc2.parameters():
             param.requires_grad = True
+
