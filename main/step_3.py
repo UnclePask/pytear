@@ -3,18 +3,24 @@ Created on 30 dic 2024
 
 @author: pasquale
 '''
+import pandas as pd
+import numpy as np
+import convert as make
+import torch
 from openai import OpenAI
 from thinc.compat import torch
 from transformers import BertTokenizer, BertModel
 from bert_ml.BERT_arch import BERT_Arch
 from alive_progress import alive_bar
-import pandas as pd
-import numpy as np
-import convert as make
 
 class step_3(object):
+    '''
     
+    '''
     def __init__(self, speech_df):
+        '''
+        Constructor
+        '''
         try:
             self.df = speech_df
             if 'PropDetectionSynth' not in self.df:
@@ -25,7 +31,7 @@ class step_3(object):
             print('\nError (5): reindex of data frame function failed in the node 3 \n\n')
         
         try:
-            self.path = '../unclepask_propaganda_alpha6.pt'
+            self.path = '../unclepask_propaganda_alpha5.pt'
             self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
             self.bert = BertModel.from_pretrained('bert-base-uncased')
             self.uncle_pask = torch.load(self.path)
@@ -37,9 +43,13 @@ class step_3(object):
             print('\nError (6): instance of BERT model failed \n\n')
         
     def propaganda_detection(self):
+        '''
+        
+        '''
         try:
             TEXT_POS = self.df.columns.get_loc('Abstract')
             TXTN_POS = self.df.columns.get_loc('topic')
+            TITL_POS = self.df.columns.get_loc('title')
             SDET_POS = self.df.columns.get_loc('PropDetectionSynth')
             NDET_POS = self.df.columns.get_loc('PropDetectionNoSynth')
         except:
@@ -50,9 +60,13 @@ class step_3(object):
         print('\n(3) Running - Propaganda detection (synth & no synth data):')
         with alive_bar(progress_index) as bar:
             for i, row in self.df.iterrows():
+    #           if i == 3:
+    #               break
                 try:
-                    text = row[TEXT_POS]
+                    title = row[TITL_POS]
+                    topic = row[TEXT_POS]
                     text_nosynth = row[TXTN_POS]
+                    text = '{0}{1}'.format(title, topic)
                 except:
                     text = 'Riga ' + i + ' non e\' una stringa\n'
                     text_nosynth = 'Riga ' + i + ' non e\' una stringa\n'
@@ -100,18 +114,19 @@ class step_3(object):
                     row[NDET_POS] = 'Propaganda detection superata'
                     
                 data.append(row)
-                tb4 = pd.DataFrame(data, columns=['fullName', 'whoIs', 'surname', 'topic', 'title', 'metadata', 'source', 'FleschReadIndex', 'SmogIndex', 'PolarityScore', 'EmpathyScore', 'UglyScore', 'StyleText', 'Abstract', 'Keywords', 'PropDetectionSynth', 'PropDetectionNoSynth'])
+                tb4 = pd.DataFrame(data, columns=['name', 'surname', 'holiday', 'death', 'nationality', 'political_party', 'value', 'topic', 'title', 'metadata', 'source', 'FleschReadIndex', 'SmogIndex', 'PolarityScore', 'EmpathyScore', 'UglyScore', 'StyleText', 'Abstract', 'Keywords', 'PropDetectionSynth', 'PropDetectionNoSynth'])
                 bar()
         
         return tb4
     
-    def report(self, pathAnagr):
+    def authorAnalysis(self, pathAnagr):
         '''
         Integrazione con AI generativa attualmente non implementata
         '''
         tb5 = make.convert.importJson(pathAnagr)
 
         try:
+            NAME_POS = tb5.columns.get_loc('name')
             SURN_POS = tb5.columns.get_loc('surname')
             if 'AuthorAnalysis' not in self.df:
                 self.df = self.df.assign(AuthorAnalysis=lambda x: ' ')
@@ -124,10 +139,11 @@ class step_3(object):
         print('Author Analysis:')
         with alive_bar(progress_index) as bar:
             for i, row in tb5.iterrows():
+                name = row[NAME_POS]
                 surname = row[SURN_POS]
                 
                 try:
-                    prompt = 'author analysis of {0}'.format(surname)                                           
+                    prompt = 'author analysis of {0} {1}'.format(name, surname)                                           
                     completion = client.chat.completions.create(model="gpt-3.5-turbo",
                                                                 messages=[{"role": "user", 
                                                                            "content": prompt }]
@@ -142,3 +158,7 @@ class step_3(object):
                 bar()
         
         return tb5
+        
+        
+        
+    
