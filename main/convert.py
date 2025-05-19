@@ -1,5 +1,5 @@
 '''
-Created on 22 dic 2024
+Created on 19 may 2025
 
 Class convert di metodi statici per convertire i dataframe verso formati file
 
@@ -75,9 +75,9 @@ class convert(object):
                 raise Exception 
         else:
             if io == 'input':
-                path_string = str(Path.cwd()) + '\/inputFile\/speech-a.tsv'
+                path_string = str(Path.cwd()) + '/inputFile/speech-a.tsv'
             elif io == 'output':
-                path_string = str(Path.cwd()) + '\/outputFile\/speech-b.tsv'
+                path_string = str(Path.cwd()) + '/outputFile/speech-b.tsv'
             else:
                 raise Exception
         return path_string
